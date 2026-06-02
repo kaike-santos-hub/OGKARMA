@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OG KARMA - Contato</title>
+    <link rel="stylesheet" href="1ogkarma.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        
+        #espaco_topo{
+            height: 90px;
+        }
+        *{
+            padding-left: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Barra de cima -->
+    <nav class="topbar">
+        <div class="logo">OG KARMA</div>
+        <ul class="menu">
+            <li><a href="1ogkarma.html#inicio">Início</a></li>
+            <li><a href="1ogkarma.html#catalogo">Destaques</a></li>
+            <li><a href="1ogkarmaroupa.html">Roupas</a></li>
+            <li><a href="1ogkarmapecas.html">Skate</a></li>
+            <li><a href="#hero">Contato</a></li>
+        </ul>
+    </nav>
+
+    <section id="espaco_topo"><pre> </pre></section>
+
+    <header>
+        <h1 style="color: white;">Fale com nosso BOT assistente!!</h1>
+    </header>
+    <main>
+        <form id="form">
+            <label for="mensagem" style="color: white;">Digite sua mensagem para o atendente virtual:</label><br /><br><br>
+            <input type="text" id="mensagem" name="mensagem" required /><br><br>
+            <button type="submit" id="btn-enviar">Enviar</button> <br> <br>
+
+            <!-- <input type="text" id="resposta_bot" > -->
+             <div id="resposta_bot"></div>
+        </form>
+    </main>
+
+
+
+
+
+
+ 
+
+    <button id="mudar-tema">🌙</button>
+    
+
+    <script>
+
+// Script para tela de login
+
+
+        // const cad = document.getElementById("btn-cadastrar");
+
+
+    <!--Script para o tema escuro gambiarradinho-->
+        const btn = document.getElementById("mudar-tema");
+        const body = document.body;
+
+        if (localStorage.getItem("tema") === "dark") {
+            body.classList.add("dark");
+            btn.textContent = "☀️";
+        }
+
+        btn.addEventListener("click", () => {
+            body.classList.toggle("dark");
+
+            if (body.classList.contains("dark")) {
+                btn.textContent = "☀️";
+                localStorage.setItem("tema", "dark");
+            } else {
+                btn.textContent = "🌙";
+                localStorage.setItem("tema", "light");
+            }
+        });
+
+        // javascript do carrinho//
+        // document.addEventListener("DOMContentLoaded", () => {
+        //     let carrinho = [];
+        //     let total = 0;
+        //     const abrirCarrinhoBtn = document.getElementById("abrir-carrinho");
+        //     const fecharCarrinhoBtn = document.getElementById("fechar-carrinho");
+        //     const limparCarrinhoBtn = document.getElementById("limpar-carrinho");
+        //     const finalizarCompraBtn = document.getElementById("finalizar-compra");
+        //     const carrinhoMenu = document.getElementById("carrinho");
+        //     const listaCarrinho = document.getElementById("lista-carrinho");
+        //     const totalCarrinho = document.getElementById("total-carrinho");
+
+        //     abrirCarrinhoBtn.onclick = () => carrinhoMenu.classList.add("aberto");
+        //     fecharCarrinhoBtn.onclick = () => carrinhoMenu.classList.remove("aberto");
+
+        //     window.adicionarCarrinho = (nome, preco) => {
+        //         carrinho.push({ nome, preco });
+        //         total += preco;
+        //         atualizarCarrinho();
+        //     };
+
+        //     function removerItem(index) {
+        //         total -= carrinho[index].preco;
+        //         carrinho.splice(index, 1);
+        //         atualizarCarrinho();
+        //     }
+        //     function atualizarCarrinho() {
+        //         listaCarrinho.innerHTML = "";
+
+        //         carrinho.forEach((item, index) => {
+        //             let li = document.createElement("li");
+
+        //             li.innerHTML = `
+        //         ${item.nome} - R$ ${item.preco.toFixed(2)}
+        //         <button class="remover-item" onclick="removerItem(${index})">X</button>
+        //     `;
+
+        //             listaCarrinho.appendChild(li);
+        //         });
+
+        //         totalCarrinho.textContent = total.toFixed(2);
+        //     }
+
+        //     limparCarrinhoBtn.onclick = () => {
+        //         carrinho = [];
+        //         total = 0;
+        //         atualizarCarrinho();
+        //     };
+
+        //     finalizarCompraBtn.onclick = () => {
+        //         if (carrinho.length === 0) {
+        //             alert("Carrinho vazio!");
+        //             return;
+        //         }
+
+        //         alert("Sua compra foi finalizada! Valeu por fortalecer a OGKARMA");
+
+        //         carrinho = [];
+        //         total = 0;
+        //         atualizarCarrinho();
+        //     };
+
+        //     window.removerItem = removerItem;
+        // });
+
+
+
+
+
+        let aguardandoResposta = false;
+        const historicoChat = []
+
+        const form = document.getElementById('form');
+        const respostas = document.getElementById('resposta-bot');
+        const botaoEnviar = document.getElementById("btn-enviar");
+        const campoMensagem = document.getElementById("mensagem");
+
+        async function enviarMensagem() {
+            if (aguardandoResposta) {
+                return;
+            }
+
+            aguardandoResposta = true;
+
+            campoMensagem.disabled = true;
+            botaoEnviar.disabled = true;
+            botaoEnviar.textContent = "Respondendo...";
+
+            try {
+                const textoDoUsuario = document.getElementById('mensagem').value;
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 
+                        "Content-Type": "application/json" 
+                    },
+                    body: JSON.stringify({
+                        mensagem: textoDoUsuario,
+                        historico: historicoChat
+                    })
+                });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    console.error(data);
+                    throw new Error(data.message);
+                    return;
+                }
+                if (!data.resposta) {
+                    console.error("Resposta inválida:", data);
+                    return;
+                }
+
+                console.log(data);
+                
+                const respostaFormatada = data.resposta.replace(/\n/g, '<br><br>');
+                document.getElementById('resposta_bot').innerHTML = respostaFormatada;
+
+                historicoChat.push({
+                    role: "user", parts: [{ text: textoDoUsuario }]
+                });
+                historicoChat.push({
+                    role: "model", parts: [{ text: data.resposta }]
+                });
+
+            // document.getElementById('resposta_bot').value = data.resposta;
+            
+        } catch (erro) {
+            document.getElementById("resposta_bot").innerHTML =
+            "⚠️ O assistente está ocupado. Tente novamente em alguns segundos.";
+
+            console.error(erro);
+            
+        } finally {
+            aguardandoResposta = false;
+            botaoEnviar.disabled = false;
+            campoMensagem.disabled = false;
+            botaoEnviar.textContent = "Enviar";
+        }
+        }
+        form.addEventListener('submit', (evento) => {
+            evento.preventDefault();
+            enviarMensagem();
+        })
+
+        
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OG KARMA - Loja Skate & Streetwear</title>
+    <link rel="stylesheet" href="1ogkarma.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class "dark">
+    <!-- Barra de cima -->
+    <nav class="topbar">
+        <div class="logo">OG KARMA</div>
+        <ul class="menu">
+            <li><a href="#inicio">Início</a></li>
+            <li><a href="#catalogo">Destaques</a></li>
+            <li><a href="1ogkarmaroupa.html">Roupas</a></li>
+            <li><a href="1ogkarmapecas.html">Skate</a></li>
+            <li><a href="1ogkarmacontato.html">Contato</a></li>
+        </ul>
+    </nav>
+    <section class="inicio" id="inicio" style="min-height: 80px;">gambiarra</section>
+
+    <section id="hero" class="hero-section">
+        <div class="slide-content" style="padding-bottom: 60px;">
+            <h1 class="hero-title"><i class="fas fa-skating"></i>OG KARMA</h1>
+            <p class="hero-subtitle">Seu estilo, sua vibe, seu skate!</p>
+            <a href="#catalogo"><button class="cta-button">
+                <i class="fas fa-store"></i> Ver Produtos
+            </button></a>
+        </div>
+        
+        <div class="slide-content" style="padding-bottom: 60px;">
+            <h1 class="hero-title"><i class="fas fa-tshirt"></i>Streetwear Autêntico</h1>
+            <p class="hero-subtitle">Camisetas, hoodies e muito mais</p>
+            <a href="1ogkarmaroupa.html"><button class="cta-button">
+                <i class="fas fa-shopping-cart"></i> Comprar Agora
+            </button></a>
+        </div>
+        
+        <div class="slide-content" style="padding-bottom: 60px;">
+            <h1 class="hero-title"><i class="fas fa-skateboard"></i>Peças de Skate</h1>
+            <p class="hero-subtitle">Shapes, trucks, rodas e rolamentos</p>
+            <a href="1ogkarmapeças.html"><button class="cta-button">
+                <i class="fas fa-box"></i> Ver Peças
+            </button></a>
+        </div>
+
+    </section>
+
+    <!-- Catálogo -->
+    <section id="catalogo" class="catalogo-section hidden">
+        <div class="container">
+            <header class="catalogo-header" style="padding-bottom: 15px;">
+                <h1><i class="fas fa-skateboard"></i>OG KARMA</h1>
+                <p>Moda Street & Peças de Skate</p>
+            </header>
+            <div class="produtos-grid" id="produtos-grid">
+
+                </div>
+    </section>
+
+    <!-- sistema do carrinho -->
+    <div id="carrinho" class="carrinho">
+        <h2>Carrinho</h2>
+        <ul id="lista-carrinho"></ul>
+
+        <p class="total">Total: R$ <span id="total-carrinho">0.00</span></p>
+
+        <button id="limpar-carrinho" class="btn-carrinho-extra">🗑️ Limpar Carrinho</button>
+        <button id="finalizar-compra" class="btn-carrinho-extra">✔ Finalizar Compra</button>
+
+        <button id="fechar-carrinho" class="fechar-carrinho">Fechar</button>
+    </div>
+
+    <button id="abrir-carrinho" class="botao-carrinho">🛒</button>
+
+    <!--Script para o tema escuro gambiarradinho-->
+
+    <button id="mudar-tema">🌙</button>
+
+    <script>
+
+        fetch("http://localhost:3000/produtos")
+
+            .then(res => res.json())
+
+            .then(produtos => {
+                const lista = document.getElementById("catalogo");
+                const shape = document.getElementById("produtos-grid");
+                produtos.filter(produto => produto.img_produto === "imagem/Camisa1.jpg")
+                .forEach(produto => {
+                    
+                    shape.innerHTML += `
+                        <div class="produto-item">
+                            <img src="${produto.img_produto}" alt="${produto.nome_produto} ${produto.tamanho_produto}">
+                            <h3>${produto.nome_produto} ${produto.tamanho_produto}</h3>
+                            <p class="preço">R$ ${produto.preço_produto}</p>
+                            <button class="btn-pedido" onclick="adicionarCarrinho('${produto.nome_produto}', ${produto.preço_produto})">Adicionar</button>
+                            </div>
+                            `;
+                        });
+
+
+                produtos.filter(produto => produto.img_produto === "imagem/Camisa8.jpg")
+                .forEach(produto => {
+                    
+                    shape.innerHTML += `
+                        <div class="produto-item">
+                            <img src="${produto.img_produto}" alt="${produto.nome_produto} ${produto.tamanho_produto}">
+                            <h3>${produto.nome_produto} ${produto.tamanho_produto}</h3>
+                            <p class="preço">R$ ${produto.preço_produto}</p>
+                            <button class="btn-pedido" onclick="adicionarCarrinho('${produto.nome_produto}', ${produto.preço_produto})">Adicionar</button>
+                            </div>
+                            `;
+                        });
+
+
+                produtos.filter(produto => produto.img_produto === "imagem/skate4.png")
+                .forEach(produto => {
+                    
+                    shape.innerHTML += `
+                        <div class="produto-item">
+                            <img src="${produto.img_produto}" alt="${produto.nome_produto} ${produto.tamanho_produto}">
+                            <h3>${produto.nome_produto} ${produto.tamanho_produto}</h3>
+                            <p class="preço">R$ ${produto.preço_produto}</p>
+                            <button class="btn-pedido" onclick="adicionarCarrinho('${produto.nome_produto}', ${produto.preço_produto})">Adicionar</button>
+                            </div>
+                            `;
+                        });
+
+
+                produtos.filter(produto => produto.img_produto === "imagem/Roda4.jpg")
+                .forEach(produto => {
+                    
+                    shape.innerHTML += `
+                        <div class="produto-item">
+                            <img src="${produto.img_produto}" alt="${produto.nome_produto} ${produto.tamanho_produto}">
+                            <h3>${produto.nome_produto} ${produto.tamanho_produto}</h3>
+                            <p class="preço">R$ ${produto.preço_produto}</p>
+                            <button class="btn-pedido" onclick="adicionarCarrinho('${produto.nome_produto}', ${produto.preço_produto})">Adicionar</button>
+                            </div>
+                            `;
+                        });
+
+
+                produtos.filter(produto => produto.img_produto === "imagem/Calca1.png")
+                .forEach(produto => {
+                    
+                    shape.innerHTML += `
+                        <div class="produto-item">
+                            <img src="${produto.img_produto}" alt="${produto.nome_produto} ${produto.tamanho_produto}">
+                            <h3>${produto.nome_produto} ${produto.tamanho_produto}</h3>
+                            <p class="preço">R$ ${produto.preço_produto}</p>
+                            <button class="btn-pedido" onclick="adicionarCarrinho('${produto.nome_produto}', ${produto.preço_produto})">Adicionar</button>
+                            </div>
+                            `;
+                        });
+                produtos.filter(produto => produto.img_produto === "imagem/Chapeus1.jpg")
+                .forEach(produto => {
+                    
+                    shape.innerHTML += `
+                        <div class="produto-item">
+                            <img src="${produto.img_produto}" alt="${produto.nome_produto} ${produto.tamanho_produto}">
+                            <h3>${produto.nome_produto} ${produto.tamanho_produto}</h3>
+                            <p class="preço">R$ ${produto.preço_produto}</p>
+                            <button class="btn-pedido" onclick="adicionarCarrinho('${produto.nome_produto}', ${produto.preço_produto})">Adicionar</button>
+                            </div>
+                            `;
+                        });
+                produtos.filter(produto => produto.img_produto === "imagem/Chapeus8.jpg")
+                .forEach(produto => {
+                    
+                    shape.innerHTML += `
+                        <div class="produto-item">
+                            <img src="${produto.img_produto}" alt="${produto.nome_produto} ${produto.tamanho_produto}">
+                            <h3>${produto.nome_produto} ${produto.tamanho_produto}</h3>
+                            <p class="preço">R$ ${produto.preço_produto}</p>
+                            <button class="btn-pedido" onclick="adicionarCarrinho('${produto.nome_produto}', ${produto.preço_produto})">Adicionar</button>
+                            </div>
+                            `;
+                        });
+                produtos.filter(produto => produto.img_produto === "imagem/Truck3.jpg")
+                .forEach(produto => {
+                    
+                    shape.innerHTML += `
+                        <div class="produto-item">
+                            <img src="${produto.img_produto}" alt="${produto.nome_produto} ${produto.tamanho_produto}">
+                            <h3>${produto.nome_produto} ${produto.tamanho_produto}</h3>
+                            <p class="preço">R$ ${produto.preço_produto}</p>
+                            <button class="btn-pedido" onclick="adicionarCarrinho('${produto.nome_produto}', ${produto.preço_produto})">Adicionar</button>
+                            </div>
+                            `;
+                        });
+            })
+
+            .catch(erro => {
+                console.log("Erro:", erro);
+            });
+
+
+
+
+
+        const btn = document.getElementById("mudar-tema");
+        const body = document.body;
+
+        if (localStorage.getItem("tema") === "dark") {
+            body.classList.add("dark");
+            btn.textContent = "☀️";
+        }
+
+        btn.addEventListener("click", () => {
+            body.classList.toggle("dark");
+
+            if (body.classList.contains("dark")) {
+                btn.textContent = "☀️";
+                localStorage.setItem("tema", "dark");
+            } else {
+                btn.textContent = "🌙";
+                localStorage.setItem("tema", "light");
+            }
+        });
+
+        //javascript do carrinho//
+        document.addEventListener("DOMContentLoaded", () => {
+            let carrinho = [];
+            let total = 0;
+
+            const abrirCarrinhoBtn = document.getElementById("abrir-carrinho");
+            const fecharCarrinhoBtn = document.getElementById("fechar-carrinho");
+            const limparCarrinhoBtn = document.getElementById("limpar-carrinho");
+            const finalizarCompraBtn = document.getElementById("finalizar-compra");
+            const carrinhoMenu = document.getElementById("carrinho");
+            const listaCarrinho = document.getElementById("lista-carrinho");
+            const totalCarrinho = document.getElementById("total-carrinho");
+
+            abrirCarrinhoBtn.onclick = () => carrinhoMenu.classList.add("aberto");
+            fecharCarrinhoBtn.onclick = () => carrinhoMenu.classList.remove("aberto");
+
+            window.adicionarCarrinho = (nome, preco) => {
+                carrinho.push({ nome, preco });
+                total += preco;
+                atualizarCarrinho();
+            };
+
+            function removerItem(index) {
+                total -= carrinho[index].preco;
+                carrinho.splice(index, 1);
+                atualizarCarrinho();
+            }
+
+            function atualizarCarrinho() {
+                listaCarrinho.innerHTML = "";
+
+                carrinho.forEach((item, index) => {
+                    let li = document.createElement("li");
+
+                    li.innerHTML = `
+                ${item.nome} - R$ ${item.preco.toFixed(2)}
+                <button class="remover-item" onclick="removerItem(${index})">X</button>
+            `;
+
+                    listaCarrinho.appendChild(li);
+                });
+
+                totalCarrinho.textContent = total.toFixed(2);
+            }
+
+            limparCarrinhoBtn.onclick = () => {
+                carrinho = [];
+                total = 0;
+                atualizarCarrinho();
+            };
+
+            finalizarCompraBtn.onclick = () => {
+                if (carrinho.length === 0) {
+                    alert("Carrinho vazio!");
+                    return;
+                }
+
+                alert("Sua compra foi finalizada! Valeu por fortalecer a OGKARMA");
+
+                carrinho = [];
+                total = 0;
+                atualizarCarrinho();
+            };
+
+            window.removerItem = removerItem;
+        });
+    </script>
+</body>
+</html>

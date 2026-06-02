@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Produtos</title>
+    <link rel="stylesheet" href="1ogkarma.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+    <nav class="topbar">
+        <div class="logo">OG KARMA</div>
+        <ul class="menu">
+            <li><a href="1ogkarma.html">Início</a></li>
+            <li><a href="1ogkarma.html#catalogo">Destaques</a></li>
+            <li><a href="#hero">Roupas</a></li>
+            <li><a href="1ogkarmapecas.html">Skate</a></li>
+            <li><a href="1ogkarmacontato.html">Contato</a></li>
+        </ul>
+    </nav>
+
+    <section class="catalogo-section" style="padding-top:120px;" id="hero">
+
+
+        <section class="catalogo-peças" style="padding-top:15px;" id="camisa">
+             <div class="container" id="container">
+                <header class="catalogo-header">
+                    <h1>Camisas:</h1>
+                </header>
+                <br>
+            </div>
+                <div class="produtos-grid" id="produtos-grid-camisa">
+
+                </div>
+        </section>
+
+
+        <section class="catalogo-peças" style="padding-top:15px;" id="calca">
+             <div class="container" id="container">
+                <header class="catalogo-header">
+                    <h1 style="padding-bottom: 15px;">Calças:</h1>
+                </header>
+                <div class="produtos-grid" id="produtos-grid-calca">
+
+                </div>
+            </div>
+        </section>
+
+
+        <section class="catalogo-peças" style="padding-top:15px;" id="chapeus">
+             <div class="container" id="container">
+                <header class="catalogo-header">
+                    <h1 style="padding-bottom: 15px;">Chapéus:</h1>
+                </header>
+                <div class="produtos-grid" id="produtos-grid-chapeus">
+
+                </div>
+            </div>
+        </section>
+
+    </section>
+
+    <div id="carrinho" class="carrinho">
+        <h2>Carrinho</h2>
+        <ul id="lista-carrinho"></ul>
+
+        <p class="total">Total: R$ <span id="total-carrinho">0.00</span></p>
+
+        <button id="limpar-carrinho" class="btn-carrinho-extra">🗑️ Limpar Carrinho</button>
+        <button id="finalizar-compra" class="btn-carrinho-extra">✔ Finalizar Compra</button>
+
+        <button id="fechar-carrinho" class="fechar-carrinho">Fechar</button>
+    </div>
+
+    <button id="abrir-carrinho" class="botao-carrinho">🛒</button>
+
+    <!--Script para o tema escuro gambiarradinho-->
+
+    <button id="mudar-tema">🌙</button>
+
+    <script>
+
+        // Faz requisição para a API
+        fetch("http://localhost:3000/produtos")
+
+            .then(res => res.json())
+
+            .then(produtos => {
+                const lista = document.getElementById("camisa");
+                const camisa = document.getElementById("produtos-grid-camisa");
+                produtos.filter(produto => produto.tipo_produto === "camisa")
+                .forEach(produto => {
+                    
+                    camisa.innerHTML += `
+                        <div class="produto-item">
+                            <img src="${produto.img_produto}" alt="${produto.nome_produto} ${produto.tamanho_produto}">
+                            <h3>${produto.nome_produto} ${produto.tamanho_produto}</h3>
+                            <p class="preço">R$ ${produto.preço_produto}</p>
+                            <button class="btn-pedido" onclick="adicionarCarrinho('${produto.nome_produto}', ${produto.preço_produto})">Adicionar</button>
+                            </div>
+                            `;
+                        });
+
+
+                const calca = document.getElementById("produtos-grid-calca");
+                // lista.innerHTML += `<h1><i class="fas fa-skateboard"></i>Trucks</h1>`;
+                produtos.filter(produto => produto.tipo_produto === "calca")
+                .forEach(produto => {
+
+                    calca.innerHTML += `
+                    <div class="produto-item">
+                        <img src="${produto.img_produto}" alt="${produto.nome_produto} ${produto.tamanho_produto}">
+                        <h3>${produto.nome_produto} ${produto.tamanho_produto}</h3>
+                        <p class="preço">R$ ${produto.preço_produto}</p>
+                        <button class="btn-pedido" onclick="adicionarCarrinho('${produto.nome_produto}', ${produto.preço_produto})">Adicionar</button>
+                    </div>
+                    `;
+                });
+
+
+                const chapeus = document.getElementById("produtos-grid-chapeus");
+                // lista.innerHTML += `<h1><i class="fas fa-skateboard"></i>Rodas</h1>`;
+                produtos.filter(produto => produto.tipo_produto === "chapeus")
+                .forEach(produto => {
+
+                    chapeus.innerHTML += `
+                    <div class="produto-item">
+                        <img src="${produto.img_produto}" alt="${produto.nome_produto} ${produto.tamanho_produto}">
+                        <h3>${produto.nome_produto} ${produto.tamanho_produto}</h3>
+                        <p class="preço">R$ ${produto.preço_produto}</p>
+                        <button class="btn-pedido" onclick="adicionarCarrinho('${produto.nome_produto}', ${produto.preço_produto})">Adicionar</button>
+                    </div>
+                    `;
+                });
+            })
+
+            .catch(erro => {
+                console.log("Erro:", erro);
+            });
+
+
+        // modod escuro //
+
+        const btn = document.getElementById("mudar-tema");
+        const body = document.body;
+
+        if (localStorage.getItem("tema") === "dark") {
+            body.classList.add("dark");
+            btn.textContent = "☀️";
+        }
+
+        btn.addEventListener("click", () => {
+            body.classList.toggle("dark");
+
+            if (body.classList.contains("dark")) {
+                btn.textContent = "☀️";
+                localStorage.setItem("tema", "dark");
+            } else {
+                btn.textContent = "🌙";
+                localStorage.setItem("tema", "light");
+            }
+        });
+
+        // javascript do carrinho //
+        document.addEventListener("DOMContentLoaded", () => {
+            let carrinho = [];
+            let total = 0;
+
+            const abrirCarrinhoBtn = document.getElementById("abrir-carrinho");
+            const fecharCarrinhoBtn = document.getElementById("fechar-carrinho");
+            const limparCarrinhoBtn = document.getElementById("limpar-carrinho");
+            const finalizarCompraBtn = document.getElementById("finalizar-compra");
+            const carrinhoMenu = document.getElementById("carrinho");
+            const listaCarrinho = document.getElementById("lista-carrinho");
+            const totalCarrinho = document.getElementById("total-carrinho");
+
+            abrirCarrinhoBtn.onclick = () => carrinhoMenu.classList.add("aberto");
+            fecharCarrinhoBtn.onclick = () => carrinhoMenu.classList.remove("aberto");
+
+            window.adicionarCarrinho = (nome, preco) => {
+                carrinho.push({ nome, preco });
+                total += preco;
+                atualizarCarrinho();
+            };
+
+            function removerItem(index) {
+                total -= carrinho[index].preco;
+                carrinho.splice(index, 1);
+                atualizarCarrinho();
+            }
+
+            function atualizarCarrinho() {
+                listaCarrinho.innerHTML = "";
+
+                carrinho.forEach((item, index) => {
+                    let li = document.createElement("li");
+
+                    li.innerHTML = `
+                ${item.nome} - R$ ${item.preco.toFixed(2)}
+                <button class="remover-item" onclick="removerItem(${index})">X</button>
+            `;
+
+                    listaCarrinho.appendChild(li);
+                });
+
+                totalCarrinho.textContent = total.toFixed(2);
+            }
+
+            limparCarrinhoBtn.onclick = () => {
+                carrinho = [];
+                total = 0;
+                atualizarCarrinho();
+            };
+
+            finalizarCompraBtn.onclick = () => {
+                if (carrinho.length === 0) {
+                    alert("Carrinho vazio!");
+                    return;
+                }
+
+                alert("Sua compra foi finalizada! Valeu por fortalecer a OGKARMA");
+
+                carrinho = [];
+                total = 0;
+                atualizarCarrinho();
+            };
+            window.removerItem = removerItem;
+        });
+
+        async function enviarComRetry(chat, mensagem, tentativas = 5) {
+            for (let i = 0; i < tentativas; i++) {
+                try {
+                    return await chat.sendMessage(mensagem);
+                } catch (erro) {
+                    if (erro.status !== 503) throw erro;
+                
+                    await new Promise(resolve =>
+                        setTimeout(resolve, 2000)
+                    );
+                }
+            }
+        
+            throw new Error("Gemini indisponível");
+        }
+        // const resultado = await enviarComRetry(chat, mensagem);
+    </script>
+
+</body>
+</html>
