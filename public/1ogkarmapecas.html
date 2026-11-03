@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Peças de Skate - OG KARMA</title>
+    <link rel="stylesheet" href="1ogkarma.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <nav class="topbar">
+        <div class="logo">OG KARMA</div>
+        <ul class="menu">
+            <li><a href="1ogkarma.html">Início</a></li>
+            <li><a href="1ogkarma.html#catalogo">Destaques</a></li>
+            <li><a href="1ogkarmaroupa.html">Roupas</a></li>
+            <li><a href="#hero">Skate</a></li>
+            <!-- <li><a href="1ogkarmacontato.html">Duvidas</a></li> -->
+        </ul>
+    </nav>
+
+    <section class="catalogo-section" id="hero">
+        
+        <div class="container">
+            <header class="catalogo-header">
+                <h1>Catálogo de Peças de Skate</h1>
+                <p>Shapes, Trucks, Rodas e Acessórios de Alta Performance</p>
+            </header>
+            
+            <!-- filtros -->
+            <div class="filtros-container">
+                <div>
+                    <label for="filtro-marca">Marca:</label><br>
+                    <select id="filtro-marca">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="filtro-cor">Cor:</label><br>
+                    <select id="filtro-cor">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="filtro-modelo">Modelo:</label><br>
+                    <select id="filtro-modelo">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+
+                <div>
+                    <button id="btn-filtrar">Aplicar Filtros</button>
+                    <button id="btn-limpar">Limpar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secção de Shapes -->
+        <section class="catalogo-peças" id="shape">
+             <div class="container">
+                <header class="catalogo-header">
+                    <h1>Shapes:</h1>
+                </header>
+                <br>
+            </div>
+            <div class="produtos-grid" id="produtos-grid-shape"></div>
+        </section>
+
+        <!-- Sessão de Trucks -->
+        <section class="catalogo-peças" id="truck">
+             <div class="container">
+                <header class="catalogo-header">
+                    <h1>Trucks:</h1>
+                </header>
+                <div class="produtos-grid" id="produtos-grid-truck"></div>
+            </div>
+        </section>
+
+        <!-- Sessão de Rodas -->
+        <section class="catalogo-peças" id="roda">
+             <div class="container">
+                <header class="catalogo-header">
+                    <h1>Rodas:</h1>
+                </header>
+                <div class="produtos-grid" id="produtos-grid-roda"></div>
+            </div>
+        </section>
+
+    </section>
+
+    <!-- tela tipo a da CBSkateshop -->
+    <div id="modal-produto" class="modal-overlay">
+        <div class="modal-card">
+            <button class="modal-fechar" onclick="fecharModal()">&times;</button>
+            <div class="modal-imagem">
+                <img id="modal-img" src="" alt="">
+            </div>
+            <div class="modal-info">
+                <h2 id="modal-nome">Nome do Produto</h2>
+                <div class="modal-preco" id="modal-preco">R$ 0,00</div>
+                <div class="modal-pix" id="modal-pix">R$ 0,00 com Pix</div>
+                
+                <div id="modal-bloco-tamanho">
+                    <div class="modal-tamanho-label">Tamanho: <span id="modal-tamanho-atual">Padrão</span></div>
+                    <div class="tamanhos-container" id="modal-tamanhos-lista"></div>
+                </div>
+
+                <div class="modal-acoes">
+                    <div class="quantidade-box">
+                        <button onclick="alterarQtd(-1)">-</button>
+                        <span id="modal-qtd">1</span>
+                        <button onclick="alterarQtd(1)">+</button>
+                    </div>
+                    <button class="btn-modal-comprar" onclick="adicionarCarrinhoModal()">Comprar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Carrinho -->
+    <div id="carrinho" class="carrinho">
+        <h2>Carrinho</h2>
+        <ul id="lista-carrinho"></ul>
+        <p class="total">Total: R$ <span id="total-carrinho">0.00</span></p>
+        <button id="limpar-carrinho" class="btn-carrinho-extra">🗑️ Limpar Carrinho</button>
+        <button id="finalizar-compra" class="btn-carrinho-extra">✔ Finalizar Compra</button>
+        <button id="fechar-carrinho" class="fechar-carrinho">Fechar</button>
+    </div>
+
+    <button id="abrir-carrinho" class="botao-carrinho">🛒</button>
+    <button id="mudar-tema">🌙</button>
+
+    <script>
+        let todosProdutos = [];
+        let tamanhosSelecionados = {};
+        
+        let produtoModalAtual = null;
+        let tamanhoModalAtual = '';
+        let quantidadeModalAtual = 1;
+        let produtosAgrupadosGlobal = {};
+        let carrinhoGlobal = [];
+        let totalGlobal = 0;
+        let atualizarCarrinhoGlobal = () => {};
+
+        function popularFiltros(produtos) {
+            const marcas = [...new Set(produtos.map(p => p.marca_produto).filter(Boolean))];
+            const cores = [...new Set(produtos.map(p => p.cor_produto).filter(Boolean))];
+            const modelos = [...new Set(produtos.map(p => p.modelo_produto).filter(Boolean))];
+
+            const selectMarca = document.getElementById("filtro-marca");
+            const selectCor = document.getElementById("filtro-cor");
+            const selectModelo = document.getElementById("filtro-modelo");
+
+            selectMarca.innerHTML = '<option value="">Todas</option>';
+            selectCor.innerHTML = '<option value="">Todas</option>';
+            selectModelo.innerHTML = '<option value="">Todos</option>';
+
+            marcas.forEach(m => selectMarca.innerHTML += `<option value="${m}">${m}</option>`);
+            cores.forEach(c => selectCor.innerHTML += `<option value="${c}">${c}</option>`);
+            modelos.forEach(mod => selectModelo.innerHTML += `<option value="${mod}">${mod}</option>`);
+        }
+
+        function obterCaminhoImagem(img) {
+            if (!img) return '';
+            if (img.startsWith('http') || img.startsWith('/')) return img;
+            let limpo = img.replace(/^public\//, '');
+            if (!limpo.startsWith('imagem/')) {
+                limpo = 'imagem/' + limpo;
+            }
+            return '/' + limpo;
+        }
+
+        function selecionarTamanho(nomeProduto, tamanho, elementoBtn) {
+            tamanhosSelecionados[nomeProduto] = tamanho;
+            const container = elementoBtn.parentElement;
+            container.querySelectorAll('.btn-tamanho').forEach(b => b.classList.remove('selecionado'));
+            elementoBtn.classList.add('selecionado');
+        }
+
+        function abrirModal(nomeProduto) {
+            const produto = produtosAgrupadosGlobal[nomeProduto];
+            if (!produto) return;
+
+            produtoModalAtual = produto;
+            quantidadeModalAtual = 1;
+            document.getElementById("modal-qtd").textContent = quantidadeModalAtual;
+
+            const imagemSrc = obterCaminhoImagem(produto.img_produto);
+            document.getElementById("modal-img").src = imagemSrc;
+            document.getElementById("modal-nome").textContent = produto.nome_produto;
+            
+            const preco = produto.preco_produto || produto.preço_produto || 0;
+            document.getElementById("modal-preco").textContent = `R$ ${preco.toFixed(2)}`;
+            
+            const precoPix = preco * 0.95;
+            document.getElementById("modal-pix").textContent = `R$ ${precoPix.toFixed(2)} com Pix`;
+
+            const blocoTamanho = document.getElementById("modal-bloco-tamanho");
+            const listaTamanhosModal = document.getElementById("modal-tamanhos-lista");
+            listaTamanhosModal.innerHTML = "";
+
+            if (!produto.tamanhosDisponiveis || produto.tamanhosDisponiveis.length === 0) {
+                blocoTamanho.style.display = "none";
+                tamanhoModalAtual = produto.tamanho_produto || "Padrão";
+            } else {
+                blocoTamanho.style.display = "block";
+                tamanhoModalAtual = tamanhosSelecionados[nomeProduto] || produto.tamanhosDisponiveis[0];
+                document.getElementById("modal-tamanho-atual").textContent = tamanhoModalAtual.toUpperCase();
+
+                produto.tamanhosDisponiveis.forEach(tam => {
+                    const classeAtiva = tamanhoModalAtual === tam ? 'selecionado' : '';
+                    listaTamanhosModal.innerHTML += `<button class="btn-tamanho ${classeAtiva}" onclick="selecionarTamanhoModal('${tam}', this)">${tam.toUpperCase()}</button>`;
+                });
+            }
+
+            document.getElementById("modal-produto").classList.add("ativo");
+        }
+
+        function selecionarTamanhoModal(tam, elementoBtn) {
+            tamanhoModalAtual = tam;
+            document.getElementById("modal-tamanho-atual").textContent = tam.toUpperCase();
+            const container = elementoBtn.parentElement;
+            container.querySelectorAll('.btn-tamanho').forEach(b => b.classList.remove('selecionado'));
+            elementoBtn.classList.add('selecionado');
+        }
+
+        function fecharModal() {
+            document.getElementById("modal-produto").classList.remove("ativo");
+        }
+
+        function alterarQtd(valor) {
+            quantidadeModalAtual += valor;
+            if (quantidadeModalAtual < 1) quantidadeModalAtual = 1;
+            document.getElementById("modal-qtd").textContent = quantidadeModalAtual;
+        }
+
+        function adicionarCarrinhoModal() {
+            if (!produtoModalAtual) return;
+            const precoItem = produtoModalAtual.preco_produto || produtoModalAtual.preço_produto || 0;
+            
+            for (let i = 0; i < quantidadeModalAtual; i++) {
+                carrinhoGlobal.push({
+                    nome: produtoModalAtual.nome_produto,
+                    preco: precoItem,
+                    tamanho: tamanhoModalAtual
+                });
+                totalGlobal += precoItem;
+            }
+            
+            atualizarCarrinhoGlobal();
+            fecharModal();
+            document.getElementById("carrinho").classList.add("aberto");
+        }
+
+        function renderizarProdutos(produtos) {
+            const shapeGrid = document.getElementById("produtos-grid-shape");
+            const truckGrid = document.getElementById("produtos-grid-truck");
+            const rodaGrid = document.getElementById("produtos-grid-roda");
+
+            if (shapeGrid) shapeGrid.innerHTML = "";
+            if (truckGrid) truckGrid.innerHTML = "";
+            if (rodaGrid) rodaGrid.innerHTML = "";
+
+            produtosAgrupadosGlobal = {};
+            produtos.forEach(produto => {
+                if (!produtosAgrupadosGlobal[produto.nome_produto]) {
+                    produtosAgrupadosGlobal[produto.nome_produto] = {
+                        ...produto,
+                        tamanhosDisponiveis: []
+                    };
+                }
+                const tamVal = produto.tamanho_produto;
+                if (tamVal && tamVal !== 'undefined' && tamVal !== 'null') {
+                    produtosAgrupadosGlobal[produto.nome_produto].tamanhosDisponiveis.push(tamVal);
+                }
+            });
+
+            Object.values(produtosAgrupadosGlobal).forEach(produto => {
+                const caminhoImg = obterCaminhoImagem(produto.img_produto);
+                const tipo = (produto.tipo_produto || "").toLowerCase();
+
+                let htmlTamanhos = '';
+                if (produto.tamanhosDisponiveis.length > 0) {
+                    let tamanhosUnicos = [...new Set(produto.tamanhosDisponiveis)];
+                    
+                    tamanhosUnicos.sort((a, b) => {
+                        let numA = parseFloat(a);
+                        let numB = parseFloat(b);
+                        if (!isNaN(numA) && !isNaN(numB)) {
+                            return numA - numB;
+                        }
+                        return a.localeCompare(b);
+                    });
+
+                    if (!tamanhosSelecionados[produto.nome_produto]) {
+                        tamanhosSelecionados[produto.nome_produto] = tamanhosUnicos[0];
+                    }
+
+                    htmlTamanhos += `<div class="tamanhos-container">`;
+                    tamanhosUnicos.forEach(tam => {
+                        const classeAtiva = tamanhosSelecionados[produto.nome_produto] === tam ? 'selecionado' : '';
+                        htmlTamanhos += `<button class="btn-tamanho ${classeAtiva}" onclick="selecionarTamanho('${produto.nome_produto}', '${tam}', this)">${tam.toUpperCase()}</button>`;
+                    });
+                    htmlTamanhos += `</div>`;
+                }
+
+                const precoVal = produto.preco_produto || produto.preço_produto || 0;
+
+                let cardHTML = `
+                    <div class="produto-item">
+                        <img src="${caminhoImg}" alt="${produto.nome_produto}">
+                        <h3>${produto.nome_produto}</h3>
+                        <p>Marca: ${produto.marca_produto || 'OG KARMA'} | Cor: ${produto.cor_produto || 'N/A'}</p>
+                        ${htmlTamanhos}
+                        <p class="preco">R$ ${precoVal.toFixed(2)}</p>
+                        <button class="btn-pedido" onclick="abrirModal('${produto.nome_produto}')">Comprar</button>
+                    </div>
+                `;
+
+                if (tipo.includes("shape") && shapeGrid) {
+                    shapeGrid.innerHTML += cardHTML;
+                } else if (tipo.includes("truck") && truckGrid) {
+                    truckGrid.innerHTML += cardHTML;
+                } else if (tipo.includes("roda") && rodaGrid) {
+                    rodaGrid.innerHTML += cardHTML;
+                }
+            });
+        }
+
+        fetch("http://localhost:3000/produtos")
+            .then(res => res.json())
+            .then(produtos => {
+                todosProdutos = produtos;
+                popularFiltros(produtos);
+                renderizarProdutos(produtos);
+            })
+            .catch(erro => {
+                console.log("Erro ao carregar produtos de skate:", erro);
+            });
+
+        document.getElementById("btn-filtrar").addEventListener("click", () => {
+            const marcaFiltro = document.getElementById("filtro-marca").value;
+            const corFiltro = document.getElementById("filtro-cor").value;
+            const modeloFiltro = document.getElementById("filtro-modelo").value;
+
+            const produtosFiltrados = todosProdutos.filter(produto => {
+                const matchMarca = !marcaFiltro || produto.marca_produto === marcaFiltro;
+                const matchCor = !corFiltro || produto.cor_produto === corFiltro;
+                const matchModelo = !modeloFiltro || produto.modelo_produto === modeloFiltro;
+                return matchMarca && matchCor && matchModelo;
+            });
+
+            renderizarProdutos(produtosFiltrados);
+        });
+
+        document.getElementById("btn-limpar").addEventListener("click", () => {
+            document.getElementById("filtro-marca").value = "";
+            document.getElementById("filtro-cor").value = "";
+            document.getElementById("filtro-modelo").value = "";
+            renderizarProdutos(todosProdutos);
+        });
+
+        const btn = document.getElementById("mudar-tema");
+        const body = document.body;
+
+        if (localStorage.getItem("tema") === "dark") {
+            body.classList.add("dark");
+            btn.textContent = "☀️";
+        }
+
+        btn.addEventListener("click", () => {
+            body.classList.toggle("dark");
+            if (body.classList.contains("dark")) {
+                btn.textContent = "☀️";
+                localStorage.setItem("tema", "dark");
+            } else {
+                btn.textContent = "🌙";
+                localStorage.setItem("tema", "light");
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const abrirCarrinhoBtn = document.getElementById("abrir-carrinho");
+            const fecharCarrinhoBtn = document.getElementById("fechar-carrinho");
+            const limparCarrinhoBtn = document.getElementById("limpar-carrinho");
+            const finalizarCompraBtn = document.getElementById("finalizar-compra");
+            const carrinhoMenu = document.getElementById("carrinho");
+            const listaCarrinho = document.getElementById("lista-carrinho");
+            const totalCarrinho = document.getElementById("total-carrinho");
+
+            if (abrirCarrinhoBtn) abrirCarrinhoBtn.onclick = () => carrinhoMenu.classList.add("aberto");
+            if (fecharCarrinhoBtn) fecharCarrinhoBtn.onclick = () => carrinhoMenu.classList.remove("aberto");
+
+            function removerItem(index) {
+                totalGlobal -= carrinhoGlobal[index].preco;
+                carrinhoGlobal.splice(index, 1);
+                atualizarCarrinho();
+            }
+
+            function atualizarCarrinho() {
+                if (!listaCarrinho) return;
+                listaCarrinho.innerHTML = "";
+
+                carrinhoGlobal.forEach((item, index) => {
+                    let li = document.createElement("li");
+                    li.innerHTML = `
+                        ${item.nome} (${item.tamanho.toUpperCase()}) - R$ ${item.preco.toFixed(2)}
+                        <button class="remover-item" onclick="removerItem(${index})">X</button>
+                    `;
+                    listaCarrinho.appendChild(li);
+                });
+
+                if (totalCarrinho) {
+                    totalCarrinho.textContent = totalGlobal.toFixed(2);
+                }
+            }
+
+            atualizarCarrinhoGlobal = atualizarCarrinho;
+
+            if (limparCarrinhoBtn) {
+                limparCarrinhoBtn.onclick = () => {
+                    carrinhoGlobal = [];
+                    totalGlobal = 0;
+                    atualizarCarrinho();
+                };
+            }
+
+            if (finalizarCompraBtn) {
+                finalizarCompraBtn.onclick = () => {
+                    if (carrinhoGlobal.length === 0) {
+                        alert("Carrinho vazio!");
+                        return;
+                    }
+                    alert("Sua compra foi finalizada! Valeu por fortalecer a OGKARMA");
+                    carrinhoGlobal = [];
+                    totalGlobal = 0;
+                    atualizarCarrinho();
+                };
+            }
+            window.removerItem = removerItem;
+        });
+    </script>
+</body>
+</html>
