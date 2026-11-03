@@ -2,34 +2,36 @@ import express from 'express';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import chatRoutes from './routes/ogkarmaRoutes.js';
 
-// 1. Carregar variáveis do ficheiro .env
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// 1. Carregar variáveis do .env
 dotenv.config();
 
 const app = express();
 
-// Porta do servidor (se não estiver no .env, usa 3000)
+// Porta do servidor
 const PORTA = process.env.PORTA || process.env.PORT || 3000;
 
-// Middlewares
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
 
-// Rota inicial - Alterado para abrir diretamente na página de roupas
+// configuração correta de pasta
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Rota inicial
 app.get('/', (req, res) => {
-    res.sendFile('1ogkarmaroupa.html', { root: './public' });
+    res.sendFile(path.join(__dirname, 'public', '1ogkarmaroupa.html'));
 });
 
 // Rotas de chat
 app.use('/chat', chatRoutes);
 
-/*
-|--------------------------------------------------------------------------
-| CONEXÃO COM O SUPABASE
-|--------------------------------------------------------------------------
-*/
+/* Conexão com o SupaBase */
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -39,11 +41,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 console.log("Conectando ao Supabase...");
 
-/*
-|--------------------------------------------------------------------------
-| LISTAR PRODUTOS (PEÇAS DE SKATE)
-|--------------------------------------------------------------------------
-*/
+/* lista de peças */
 
 app.get("/produtos", async (req, res) => {
     try {
@@ -65,11 +63,7 @@ app.get("/produtos", async (req, res) => {
     }
 });
 
-/*
-|--------------------------------------------------------------------------
-| CADASTRAR PRODUTO (PEÇAS DE SKATE)
-|--------------------------------------------------------------------------
-*/
+/* cadastrar peças */
 
 app.post("/produtos", async (req, res) => {
     const {
@@ -117,11 +111,7 @@ app.post("/produtos", async (req, res) => {
     }
 });
 
-/*
-|--------------------------------------------------------------------------
-| LISTAR ROUPAS
-|--------------------------------------------------------------------------
-*/
+/* listagem de roupas */
 
 app.get("/roupas", async (req, res) => {
     try {
@@ -143,11 +133,7 @@ app.get("/roupas", async (req, res) => {
     }
 });
 
-/*
-|--------------------------------------------------------------------------
-| INICIALIZAÇÃO DO SERVIDOR
-|--------------------------------------------------------------------------
-*/
+/* inicializando o servidor */
 
 app.listen(PORTA, () => {
     console.log(`Servidor rodando em http://localhost:${PORTA}`);
