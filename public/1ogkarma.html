@@ -196,8 +196,8 @@
 
         // Busca simultânea e agrupamento correto para exibir tamanhos na home
         Promise.all([
-            fetch("http://localhost:3000/produtos").then(res => res.json()).catch(() => []),
-            fetch("http://localhost:3000/roupas").then(res => res.json()).catch(() => [])
+            fetch("/produtos").then(res => res.json()).catch(() => []),
+            fetch("/roupas").then(res => res.json()).catch(() => [])
         ]).then(([pecas, roupas]) => {
             const todos = [...pecas, ...roupas];
             const shapeGrid = document.getElementById("produtos-grid");
