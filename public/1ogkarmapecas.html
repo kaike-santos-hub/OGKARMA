@@ -330,7 +330,7 @@
             });
         }
 
-        fetch("http://localhost:3000/produtos")
+        fetch("/produtos")
             .then(res => res.json())
             .then(produtos => {
                 todosProdutos = produtos;
